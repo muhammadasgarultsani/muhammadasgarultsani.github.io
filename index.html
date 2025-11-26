@@ -1,26 +1,259 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfolio</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Toko Sayur dan Buah Online</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body>
-    <!-- seputar say -->
-
-    <div class="container">
-        <div class="card">
-            <h1 class="blue">Muhammad Asgarul Tsani</h1>
-        <hr>
-
-            <h2 id="subtitle" class="center"></h2>
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal active">
+        <div class="modal-content login-form">
+            <h2>Admin Login</h2>
+            <p class="info-text">Demo: username: <strong>admin</strong> | password: <strong>admin123</strong></p>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <div class="form-buttons">
+                    <button type="submit" class="btn btn-primary">Login Admin</button>
+                    <button type="button" class="btn btn-secondary" onclick="skipLogin()">Login Pembeli</button>
+                </div>
+            </form>
+            <p id="loginError" class="error-message" style="display: none;"></p>
         </div>
     </div>
 
+    <!-- Main App Container -->
+    <div id="appContainer" style="display: none;">
+        <!-- Header/Navigation -->
+        <header class="header">
+            <div class="container">
+                <div class="logo">
+                    <i class="fas fa-leaf"></i>
+                    <h1>Toko Sayur & Buah</h1>
+                </div>
+                <nav class="navbar">
+                    <a href="#home" class="nav-link active" onclick="switchPage('home')">Home</a>
+                    <a href="#orders" class="nav-link" onclick="switchPage('orders')">Pesanan Saya</a>
+                    <a href="#admin" class="nav-link admin-link" onclick="switchPage('admin')" style="display: none;">Admin Panel</a>
+                    <a href="#" class="nav-link" onclick="logout()">Logout</a>
+                </nav>
+                <div class="user-info">
+                    <span id="userDisplay"></span>
+                </div>
+            </div>
+        </header>
 
-    <!-- seputar say -->
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Home Page -->
+            <div id="homePage" class="page active">
+                <div class="container">
+                    <h2>Daftar Produk</h2>
+                    <div class="products-grid" id="productsGrid">
+                        <!-- Products will be loaded here -->
+                    </div>
+                </div>
+            </div>
 
-    <script src="script.js"></script>
+            <!-- Orders Page -->
+            <div id="ordersPage" class="page">
+                <div class="container">
+                    <h2>Pesanan Saya</h2>
+                    <div id="ordersContainer" class="orders-container">
+                        <!-- Orders will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Panel Page -->
+            <div id="adminPage" class="page">
+                <div class="container">
+                    <h2>Admin Panel - Kelola Produk</h2>
+                    
+                    <!-- Add Product Form -->
+                    <section class="admin-section">
+                        <h3>Tambah Produk Baru</h3>
+                        <form id="addProductForm" class="admin-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="productName">Nama Produk:</label>
+                                    <input type="text" id="productName" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="productCategory">Kategori:</label>
+                                    <select id="productCategory" required>
+                                        <option value="">Pilih Kategori</option>
+                                        <option value="Sayur">Sayur</option>
+                                        <option value="Buah">Buah</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="productPrice">Harga (Rp):</label>
+                                    <input type="number" id="productPrice" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="productStock">Jumlah Tersedia:</label>
+                                    <input type="number" id="productStock" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Gambar Produk:</label>
+                                <div class="image-input-group">
+                                    <div class="tab-buttons">
+                                        <button type="button" class="tab-btn active" onclick="switchImageTab('upload')">Upload File</button>
+                                        <button type="button" class="tab-btn" onclick="switchImageTab('link')">Dari Link</button>
+                                    </div>
+                                    
+                                    <div id="uploadTab" class="image-tab active">
+                                        <label for="productImageFile">Pilih Gambar:</label>
+                                        <input type="file" id="productImageFile" accept="image/*">
+                                        <small>Format: JPG, PNG, GIF (Max 2MB)</small>
+                                    </div>
+                                    
+                                    <div id="linkTab" class="image-tab" style="display: none;">
+                                        <label for="productImageUrl">URL Gambar:</label>
+                                        <input type="text" id="productImageUrl" placeholder="https://...">
+                                    </div>
+                                </div>
+                                <div id="addImagePreview" class="image-preview">
+                                    <img id="addImagePreviewImg" src="" alt="Preview" style="display: none;">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Tambah Produk</button>
+                        </form>
+                    </section>
+
+                    <!-- Products List -->
+                    <section class="admin-section">
+                        <h3>Daftar Produk</h3>
+                        <table class="products-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nama</th>
+                                    <th>Kategori</th>
+                                    <th>Harga</th>
+                                    <th>Stock</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productsTableBody">
+                                <!-- Products will be listed here -->
+                            </tbody>
+                        </table>
+                    </section>
+                </div>
+            </div>
+
+            <!-- Cart Modal -->
+            <div id="cartModal" class="modal">
+                <div class="modal-content cart-modal">
+                    <span class="close" onclick="closeCartModal()">&times;</span>
+                    <h2>Pesan Produk</h2>
+                    <form id="cartForm">
+                        <div class="form-group">
+                            <label for="cartProductName">Produk:</label>
+                            <input type="text" id="cartProductName" readonly>
+                            <input type="hidden" id="cartProductId">
+                            <input type="hidden" id="cartProductPrice">
+                        </div>
+                        <div class="form-group">
+                            <label for="cartQuantity">Jumlah:</label>
+                            <input type="number" id="cartQuantity" min="1" value="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cartAddress">Alamat Pengiriman:</label>
+                            <textarea id="cartAddress" required placeholder="Jl. ... No. ..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Lokasi Pengiriman (Peta):</label>
+                            <div id="map" style="height: 300px; border: 1px solid #ddd; margin-bottom: 10px;"></div>
+                            <input type="hidden" id="cartLat">
+                            <input type="hidden" id="cartLng">
+                            <p class="map-info" id="mapInfo">Klik pada peta untuk memilih lokasi pengiriman</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Total Harga:</label>
+                            <p id="totalPrice" style="font-size: 20px; font-weight: bold; color: #27ae60;">Rp 0</p>
+                        </div>
+                        <div class="form-buttons">
+                            <button type="submit" class="btn btn-primary">Pesan Sekarang</button>
+                            <button type="button" class="btn btn-secondary" onclick="closeCartModal()">Batal</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Edit Product Modal -->
+            <div id="editModal" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="closeEditModal()">&times;</span>
+                    <h2>Edit Produk</h2>
+                    <form id="editForm">
+                        <input type="hidden" id="editProductId">
+                        <div class="form-group">
+                            <label for="editProductName">Nama Produk:</label>
+                            <input type="text" id="editProductName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editProductPrice">Harga (Rp):</label>
+                            <input type="number" id="editProductPrice" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editProductStock">Jumlah Tersedia:</label>
+                            <input type="number" id="editProductStock" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Gambar Produk:</label>
+                            <div class="image-input-group">
+                                <div class="tab-buttons">
+                                    <button type="button" class="tab-btn active" onclick="switchEditImageTab('upload')">Upload File</button>
+                                    <button type="button" class="tab-btn" onclick="switchEditImageTab('link')">Dari Link</button>
+                                </div>
+                                
+                                <div id="editUploadTab" class="image-tab active">
+                                    <label for="editProductImageFile">Pilih Gambar:</label>
+                                    <input type="file" id="editProductImageFile" accept="image/*">
+                                    <small>Format: JPG, PNG, GIF (Max 2MB)</small>
+                                </div>
+                                
+                                <div id="editLinkTab" class="image-tab" style="display: none;">
+                                    <label for="editProductImageUrl">URL Gambar:</label>
+                                    <input type="text" id="editProductImageUrl" placeholder="https://...">
+                                </div>
+                            </div>
+                            <div id="editImagePreview" class="image-preview">
+                                <img id="editImagePreviewImg" src="" alt="Preview">
+                            </div>
+                        </div>
+                        <div class="form-buttons">
+                            <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                            <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Batal</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2025 Toko Sayur dan Buah Online. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>
