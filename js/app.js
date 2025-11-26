@@ -136,10 +136,8 @@ function setupEventListeners() {
 }
 
 function initializeProducts() {
-    const storedProducts = localStorage.getItem('products');
-    if (!storedProducts) {
-        localStorage.setItem('products', JSON.stringify(dummyProducts));
-    }
+    // Always update products with latest dummyProducts to ensure all 50 products are available
+    localStorage.setItem('products', JSON.stringify(dummyProducts));
 }
 
 // ==========================================
@@ -265,7 +263,13 @@ function filterProducts(category) {
 
 function loadHomePage() {
     const productsGrid = document.getElementById('productsGrid');
-    const products = JSON.parse(localStorage.getItem('products')) || dummyProducts;
+    let products = JSON.parse(localStorage.getItem('products'));
+    
+    // Fallback to dummyProducts if localStorage doesn't have products
+    if (!products || products.length === 0) {
+        products = dummyProducts;
+        localStorage.setItem('products', JSON.stringify(dummyProducts));
+    }
 
     productsGrid.innerHTML = '';
 
@@ -305,7 +309,7 @@ function createProductCard(product) {
     const stockClass = product.stock <= 5 ? 'low' : '';
 
     card.innerHTML = `
-        <img src="${product.image}" alt="${product.name}" class="product-image" onerror="this.src='https://via.placeholder.com/300x300?text=${product.name}'">
+        <img src="${product.image}" alt="${product.name}" class="product-image" onerror="this.style.display='none'">
         <div class="product-info">
             <div class="product-name">${product.name}</div>
             <span class="product-category">${product.category}</span>
