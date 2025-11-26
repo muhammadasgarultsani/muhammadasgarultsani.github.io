@@ -4,86 +4,56 @@
 
 // Dummy Data - Products
 const dummyProducts = [
-    {
-        id: 1,
-        name: 'Tomat Segar',
-        category: 'Sayur',
-        price: 15000,
-        stock: 50,
-        image: 'https://images.unsplash.com/photo-1592924357228-91a4daadcccf?w=300&h=300&fit=crop'
-    },
-    {
-        id: 2,
-        name: 'Cabai Merah',
-        category: 'Sayur',
-        price: 25000,
-        stock: 30,
-        image: 'https://images.unsplash.com/photo-1599599810694-f3a7faef1dd5?w=300&h=300&fit=crop'
-    },
-    {
-        id: 3,
-        name: 'Brokoli',
-        category: 'Sayur',
-        price: 18000,
-        stock: 25,
-        image: 'https://images.unsplash.com/photo-1588195538326-c5b1e6d9b5b1?w=300&h=300&fit=crop'
-    },
-    {
-        id: 4,
-        name: 'Bayam',
-        category: 'Sayur',
-        price: 12000,
-        stock: 40,
-        image: 'https://images.unsplash.com/photo-1511621776919-a1efb6cb7a48?w=300&h=300&fit=crop'
-    },
-    {
-        id: 5,
-        name: 'Apel Merah',
-        category: 'Buah',
-        price: 30000,
-        stock: 35,
-        image: 'https://images.unsplash.com/photo-1560806e614371-faf82d8e6f3d?w=300&h=300&fit=crop'
-    },
-    {
-        id: 6,
-        name: 'Pisang Kuning',
-        category: 'Buah',
-        price: 20000,
-        stock: 45,
-        image: 'https://images.unsplash.com/photo-1603073163872-e6218f59cb00?w=300&h=300&fit=crop'
-    },
-    {
-        id: 7,
-        name: 'Jeruk Sunkist',
-        category: 'Buah',
-        price: 28000,
-        stock: 40,
-        image: 'https://images.unsplash.com/photo-1599599810694-f3a7faef1dd5?w=300&h=300&fit=crop'
-    },
-    {
-        id: 8,
-        name: 'Mangga Harum Manis',
-        category: 'Buah',
-        price: 35000,
-        stock: 20,
-        image: 'https://images.unsplash.com/photo-1595080876270-a2dd4a4c89d9?w=300&h=300&fit=crop'
-    },
-    {
-        id: 9,
-        name: 'Wortel',
-        category: 'Sayur',
-        price: 16000,
-        stock: 50,
-        image: 'https://images.unsplash.com/photo-1447941354394-2b8916f9eda9?w=300&h=300&fit=crop'
-    },
-    {
-        id: 10,
-        name: 'Strawberry Impor',
-        category: 'Buah',
-        price: 45000,
-        stock: 15,
-        image: 'https://images.unsplash.com/photo-1587393853556-f1b27fbd8d35?w=300&h=300&fit=crop'
-    }
+    { id: 1, name: 'Alpukat', category: 'Buah', price: 28000, stock: 30, image: 'img/sayur_buah/Alpukat.png' },
+    { id: 2, name: 'Anggur', category: 'Buah', price: 35000, stock: 25, image: 'img/sayur_buah/Anggur.png' },
+    { id: 3, name: 'Apel', category: 'Buah', price: 30000, stock: 35, image: 'img/sayur_buah/Apel.png' },
+    { id: 4, name: 'Bawang Merah', category: 'Rempah-Rempah', price: 25000, stock: 50, image: 'img/sayur_buah/Bawang-merah.png' },
+    { id: 5, name: 'Bawang Putih', category: 'Rempah-Rempah', price: 20000, stock: 40, image: 'img/sayur_buah/Bawang-putih.png' },
+    { id: 6, name: 'Bayam', category: 'Sayur', price: 12000, stock: 45, image: 'img/sayur_buah/Bayam.png' },
+    { id: 7, name: 'Belimbing', category: 'Buah', price: 22000, stock: 20, image: 'img/sayur_buah/Belimbing.png' },
+    { id: 8, name: 'Brokoli', category: 'Sayur', price: 18000, stock: 30, image: 'img/sayur_buah/Brokoli.png' },
+    { id: 9, name: 'Buah Naga', category: 'Buah', price: 32000, stock: 22, image: 'img/sayur_buah/Buah-naga.png' },
+    { id: 10, name: 'Buncis', category: 'Sayur', price: 16000, stock: 35, image: 'img/sayur_buah/Buncis.png' },
+    { id: 11, name: 'Ceri', category: 'Buah', price: 38000, stock: 18, image: 'img/sayur_buah/Ceri.png' },
+    { id: 12, name: 'Daun Bawang', category: 'Rempah-Rempah', price: 8000, stock: 60, image: 'img/sayur_buah/Daun-bawang.png' },
+    { id: 13, name: 'Durian', category: 'Buah', price: 85000, stock: 10, image: 'img/sayur_buah/Durian.png' },
+    { id: 14, name: 'Jambu', category: 'Buah', price: 25000, stock: 28, image: 'img/sayur_buah/Jambu.png' },
+    { id: 15, name: 'Jamur', category: 'Sayur', price: 22000, stock: 25, image: 'img/sayur_buah/Jamur.png' },
+    { id: 16, name: 'Jeruk', category: 'Buah', price: 28000, stock: 40, image: 'img/sayur_buah/Jeruk.png' },
+    { id: 17, name: 'Kacang Panjang', category: 'Sayur', price: 18000, stock: 32, image: 'img/sayur_buah/Kacang-panjang.png' },
+    { id: 18, name: 'Kangkung', category: 'Sayur', price: 10000, stock: 55, image: 'img/sayur_buah/Kangkung.png' },
+    { id: 19, name: 'Kelengkeng', category: 'Buah', price: 32000, stock: 24, image: 'img/sayur_buah/Kelengkeng.png' },
+    { id: 20, name: 'Kentang', category: 'Sayur', price: 14000, stock: 60, image: 'img/sayur_buah/Kentang.png' },
+    { id: 21, name: 'Kiwi', category: 'Buah', price: 36000, stock: 20, image: 'img/sayur_buah/Kiwi.png' },
+    { id: 22, name: 'Kol Ungu', category: 'Sayur', price: 16000, stock: 30, image: 'img/sayur_buah/Kol-ungu.png' },
+    { id: 23, name: 'Kol', category: 'Sayur', price: 15000, stock: 35, image: 'img/sayur_buah/Kol.jpg' },
+    { id: 24, name: 'Kurma', category: 'Buah', price: 42000, stock: 15, image: 'img/sayur_buah/Kurma.png' },
+    { id: 25, name: 'Labu', category: 'Sayur', price: 20000, stock: 25, image: 'img/sayur_buah/Labu.png' },
+    { id: 26, name: 'Leci', category: 'Buah', price: 38000, stock: 22, image: 'img/sayur_buah/Leci.png' },
+    { id: 27, name: 'Lemon', category: 'Buah', price: 24000, stock: 28, image: 'img/sayur_buah/Lemon.png' },
+    { id: 28, name: 'Lobak', category: 'Sayur', price: 12000, stock: 40, image: 'img/sayur_buah/Lobak.png' },
+    { id: 29, name: 'Mangga', category: 'Buah', price: 35000, stock: 25, image: 'img/sayur_buah/Mangga.png' },
+    { id: 30, name: 'Manggis', category: 'Buah', price: 40000, stock: 18, image: 'img/sayur_buah/Manggis.png' },
+    { id: 31, name: 'Melon', category: 'Buah', price: 45000, stock: 12, image: 'img/sayur_buah/Melon.png' },
+    { id: 32, name: 'Nanas', category: 'Buah', price: 22000, stock: 32, image: 'img/sayur_buah/Nanas.png' },
+    { id: 33, name: 'Paprika', category: 'Sayur', price: 26000, stock: 20, image: 'img/sayur_buah/Paprika.png' },
+    { id: 34, name: 'Pepaya', category: 'Buah', price: 26000, stock: 30, image: 'img/sayur_buah/Pepaya.png' },
+    { id: 35, name: 'Pir', category: 'Buah', price: 32000, stock: 24, image: 'img/sayur_buah/Pir.png' },
+    { id: 36, name: 'Pisang', category: 'Buah', price: 20000, stock: 50, image: 'img/sayur_buah/Pisang.png' },
+    { id: 37, name: 'Rambutan', category: 'Buah', price: 34000, stock: 26, image: 'img/sayur_buah/Rambutan.png' },
+    { id: 38, name: 'Salak', category: 'Buah', price: 28000, stock: 28, image: 'img/sayur_buah/Salak.png' },
+    { id: 39, name: 'Sawi Putih', category: 'Sayur', price: 13000, stock: 45, image: 'img/sayur_buah/Sawi-putih.png' },
+    { id: 40, name: 'Sawi', category: 'Sayur', price: 12000, stock: 48, image: 'img/sayur_buah/Sawi.png' },
+    { id: 41, name: 'Selada', category: 'Sayur', price: 14000, stock: 40, image: 'img/sayur_buah/Selada.png' },
+    { id: 42, name: 'Seledri', category: 'Rempah-Rempah', price: 15000, stock: 35, image: 'img/sayur_buah/Seledri.png' },
+    { id: 43, name: 'Semangka', category: 'Buah', price: 30000, stock: 15, image: 'img/sayur_buah/Semangka.png' },
+    { id: 44, name: 'Strawberry', category: 'Buah', price: 45000, stock: 20, image: 'img/sayur_buah/Strawberry.png' },
+    { id: 45, name: 'Terong', category: 'Sayur', price: 17000, stock: 33, image: 'img/sayur_buah/Terong.png' },
+    { id: 46, name: 'Timun', category: 'Sayur', price: 11000, stock: 50, image: 'img/sayur_buah/Timun.png' },
+    { id: 47, name: 'Tomat', category: 'Sayur', price: 15000, stock: 52, image: 'img/sayur_buah/Tomat.png' },
+    { id: 48, name: 'Wortel', category: 'Sayur', price: 16000, stock: 48, image: 'img/sayur_buah/Wortel.png' },
+    { id: 49, name: 'Bawang Bombay', category: 'Rempah-Rempah', price: 22000, stock: 35, image: 'img/sayur_buah/bawang-bombay.png' },
+    { id: 50, name: 'Kemiri', category: 'Rempah-Rempah', price: 32000, stock: 18, image: 'img/sayur_buah/kemiri.png' }
 ];
 
 // Dummy Login Data
@@ -91,6 +61,15 @@ const dummyAdmin = {
     username: 'admin',
     password: 'admin123'
 };
+
+// Advertisement Data
+const advertisements = [
+    { id: 1, image: 'img/iklan/iklan1.jpg', alt: 'Iklan 1' },
+    { id: 2, image: 'img/iklan/iklan2.jpg', alt: 'Iklan 2' },
+    { id: 3, image: 'img/iklan/iklan3.jpg', alt: 'Iklan 3' },
+    { id: 4, image: 'img/iklan/iklan4.jpg', alt: 'Iklan 4' },
+    { id: 5, image: 'img/iklan/iklan5.jpg', alt: 'Iklan 5' }
+];
 
 // ==========================================
 // Global State
@@ -101,6 +80,7 @@ let isAdminMode = false;
 let map = null;
 let selectedLocation = { lat: -6.2088, lng: 106.8456 }; // Default: Jakarta
 let currentProductIdForCart = null;
+let currentFilter = 'Semua';
 
 // ==========================================
 // Initialize Application
@@ -270,18 +250,48 @@ function switchPage(pageName) {
 // Home Page - Products List
 // ==========================================
 
+function filterProducts(category) {
+    currentFilter = category;
+    
+    // Update active button
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    // Reload products with filter
+    loadHomePage();
+}
+
 function loadHomePage() {
     const productsGrid = document.getElementById('productsGrid');
     const products = JSON.parse(localStorage.getItem('products')) || dummyProducts;
 
     productsGrid.innerHTML = '';
 
-    if (products.length === 0) {
-        productsGrid.innerHTML = '<div class="empty-state"><i class="fas fa-box-open"></i><p>Tidak ada produk tersedia</p></div>';
+    // Display advertisements
+    const adsContainer = document.createElement('div');
+    adsContainer.className = 'ads-container';
+    advertisements.forEach(ad => {
+        const adElement = document.createElement('div');
+        adElement.className = 'ad-item';
+        adElement.innerHTML = `<img src="${ad.image}" alt="${ad.alt}" class="ad-image">`;
+        adsContainer.appendChild(adElement);
+    });
+    productsGrid.appendChild(adsContainer);
+
+    // Filter products by category
+    let filteredProducts = products;
+    if (currentFilter !== 'Semua') {
+        filteredProducts = products.filter(p => p.category === currentFilter);
+    }
+
+    if (filteredProducts.length === 0) {
+        productsGrid.innerHTML += '<div class="empty-state"><i class="fas fa-box-open"></i><p>Tidak ada produk tersedia</p></div>';
         return;
     }
 
-    products.forEach(product => {
+    filteredProducts.forEach(product => {
         const card = createProductCard(product);
         productsGrid.appendChild(card);
     });
