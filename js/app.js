@@ -133,6 +133,31 @@ function setupEventListeners() {
     document.getElementById('editProductImageUrl').addEventListener('change', function(e) {
         previewImageUrl(e.target.value, 'editImagePreviewImg', 'editImagePreview');
     });
+
+    // Mobile menu toggle
+    const menuToggle = document.getElementById('menuToggle');
+    const nav = document.querySelector('.navbar');
+    if (menuToggle) {
+        // ensure aria attribute
+        if (!menuToggle.hasAttribute('aria-expanded')) menuToggle.setAttribute('aria-expanded', 'false');
+        menuToggle.addEventListener('click', function(e) {
+            const isOpen = nav && nav.classList.toggle('open');
+            // toggle appearance on button
+            menuToggle.classList.toggle('open', isOpen);
+            menuToggle.setAttribute('aria-expanded', String(isOpen));
+        });
+
+        // close nav when clicking a nav link (mobile)
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function() {
+                if (nav && nav.classList.contains('open')) {
+                    nav.classList.remove('open');
+                    menuToggle.classList.remove('open');
+                    menuToggle.setAttribute('aria-expanded', 'false');
+                }
+            });
+        });
+    }
 }
 
 function initializeProducts() {
