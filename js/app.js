@@ -53,7 +53,7 @@ const dummyProducts = [
     { id: 47, name: 'Tomat', category: 'Sayur', price: 15000, stock: 52, image: 'img/sayur_buah/Tomat.png' },
     { id: 48, name: 'Wortel', category: 'Sayur', price: 16000, stock: 48, image: 'img/sayur_buah/Wortel.png' },
     { id: 49, name: 'Bawang Bombay', category: 'Rempah-Rempah', price: 22000, stock: 35, image: 'img/sayur_buah/bawang-bombay.png' },
-    { id: 50, name: 'Kemiri', category: 'Rempah-Rempah', price: 32000, stock: 18, image: 'img/sayur_buah/kemiri.png' }
+    { id: 50, name: 'Kemiri', category: 'Rempah-Rempah', price: 32000, stock: 18, image: 'img/sayur_buah/kemiri.jpg' }
 ];
 
 // Dummy Login Data
