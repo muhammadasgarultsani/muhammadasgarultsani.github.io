@@ -60,11 +60,16 @@
             <div id="homePage" class="page active">
                 <div class="container">
                     <h2>Daftar Produk</h2>
+                    <div class="search-box-container">
+                        <input type="text" id="searchInput" class="search-box" placeholder="Cari produk..." onkeyup="searchProducts(this.value)">
+                        <i class="fas fa-search"></i>
+                    </div>
                     <div class="filter-buttons">
                         <button class="filter-btn active" onclick="filterProducts('Semua')">Semua</button>
                         <button class="filter-btn" onclick="filterProducts('Sayur')">Sayur</button>
                         <button class="filter-btn" onclick="filterProducts('Buah')">Buah</button>
                     </div>
+                    <div id="adsContainer" class="ads-section"></div>
                     <div class="products-grid" id="productsGrid">
                         <!-- Products will be loaded here -->
                     </div>
@@ -84,81 +89,135 @@
             <!-- Admin Panel Page -->
             <div id="adminPage" class="page">
                 <div class="container">
-                    <h2>Admin Panel - Kelola Produk</h2>
+                    <h2>Dashboard Admin</h2>
                     
-                    <!-- Add Product Form -->
+                    <!-- Admin Statistics -->
                     <section class="admin-section">
-                        <h3>Tambah Produk Baru</h3>
-                        <form id="addProductForm" class="admin-form">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="productName">Nama Produk:</label>
-                                    <input type="text" id="productName" required>
+                        <div class="admin-stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-shopping-cart"></i>
                                 </div>
-                                <div class="form-group">
-                                    <label for="productCategory">Kategori:</label>
-                                    <select id="productCategory" required>
-                                        <option value="">Pilih Kategori</option>
-                                        <option value="Sayur">Sayur</option>
-                                        <option value="Buah">Buah</option>
-                                    </select>
+                                <div class="stat-content">
+                                    <h3>Total Pesanan</h3>
+                                    <p id="totalOrdersStat" class="stat-number">0</p>
                                 </div>
                             </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="productPrice">Harga (Rp):</label>
-                                    <input type="number" id="productPrice" required>
+                            <div class="stat-card">
+                                <div class="stat-icon pending">
+                                    <i class="fas fa-clock"></i>
                                 </div>
-                                <div class="form-group">
-                                    <label for="productStock">Jumlah Tersedia:</label>
-                                    <input type="number" id="productStock" required>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label>Gambar Produk:</label>
-                                <div class="image-input-group">
-                                    <div class="tab-buttons">
-                                        <button type="button" class="tab-btn active" onclick="switchImageTab('upload')">Upload File</button>
-                                        <button type="button" class="tab-btn" onclick="switchImageTab('link')">Dari Link</button>
-                                    </div>
-                                    
-                                    <div id="uploadTab" class="image-tab active">
-                                        <label for="productImageFile">Pilih Gambar:</label>
-                                        <input type="file" id="productImageFile" accept="image/*">
-                                        <small>Format: JPG, PNG, GIF (Max 2MB)</small>
-                                    </div>
-                                    
-                                    <div id="linkTab" class="image-tab" style="display: none;">
-                                        <label for="productImageUrl">URL Gambar:</label>
-                                        <input type="text" id="productImageUrl" placeholder="https://...">
-                                    </div>
-                                </div>
-                                <div id="addImagePreview" class="image-preview">
-                                    <img id="addImagePreviewImg" src="" alt="Preview" style="display: none;">
+                                <div class="stat-content">
+                                    <h3>Belum Diproses</h3>
+                                    <p id="pendingOrdersStat" class="stat-number">0</p>
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-primary">Tambah Produk</button>
-                        </form>
+                            <div class="stat-card">
+                                <div class="stat-icon completed">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3>Selesai</h3>
+                                    <p id="completedOrdersStat" class="stat-number">0</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3>Total Customer</h3>
+                                    <p id="totalCustomersStat" class="stat-number">0</p>
+                                </div>
+                            </div>
+                        </div>
                     </section>
 
-                    <!-- Products List -->
+                    <!-- Pending Orders -->
                     <section class="admin-section">
-                        <h3>Daftar Produk</h3>
-                        <table class="products-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Nama</th>
-                                    <th>Kategori</th>
-                                    <th>Harga</th>
-                                    <th>Stock</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="productsTableBody">
-                                <!-- Products will be listed here -->
-                            </tbody>
-                        </table>
+                        <h3>Pesanan Belum Diproses</h3>
+                        <div id="pendingOrdersContainer" class="orders-table-container">
+                            <!-- Pending orders will be loaded here -->
+                        </div>
+                    </section>
+
+                    <!-- Product Management (Collapsible) -->
+                    <section class="admin-section">
+                        <h3 style="cursor: pointer; user-select: none;" onclick="toggleProductManagement()">
+                            <i id="productMgmtIcon" class="fas fa-chevron-down"></i> Kelola Produk
+                        </h3>
+                        <div id="productManagementSection" style="display: none; margin-top: 20px;">
+                            <!-- Add Product Form -->
+                            <form id="addProductForm" class="admin-form">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="productName">Nama Produk:</label>
+                                        <input type="text" id="productName" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="productCategory">Kategori:</label>
+                                        <select id="productCategory" required>
+                                            <option value="">Pilih Kategori</option>
+                                            <option value="Sayur">Sayur</option>
+                                            <option value="Buah">Buah</option>
+                                            <option value="Rempah-Rempah">Rempah-Rempah</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="productPrice">Harga (Rp):</label>
+                                        <input type="number" id="productPrice" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="productStock">Jumlah Tersedia:</label>
+                                        <input type="number" id="productStock" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Gambar Produk:</label>
+                                    <div class="image-input-group">
+                                        <div class="tab-buttons">
+                                            <button type="button" class="tab-btn active" onclick="switchImageTab('upload')">Upload File</button>
+                                            <button type="button" class="tab-btn" onclick="switchImageTab('link')">Dari Link</button>
+                                        </div>
+                                        
+                                        <div id="uploadTab" class="image-tab active">
+                                            <label for="productImageFile">Pilih Gambar:</label>
+                                            <input type="file" id="productImageFile" accept="image/*">
+                                            <small>Format: JPG, PNG, GIF (Max 2MB)</small>
+                                        </div>
+                                        
+                                        <div id="linkTab" class="image-tab" style="display: none;">
+                                            <label for="productImageUrl">URL Gambar:</label>
+                                            <input type="text" id="productImageUrl" placeholder="https://...">
+                                        </div>
+                                    </div>
+                                    <div id="addImagePreview" class="image-preview">
+                                        <img id="addImagePreviewImg" src="" alt="Preview" style="display: none;">
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Tambah Produk</button>
+                            </form>
+
+                            <!-- Products List -->
+                            <h4 style="margin-top: 30px; margin-bottom: 15px;">Daftar Produk</h4>
+                            <table class="products-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nama</th>
+                                        <th>Kategori</th>
+                                        <th>Harga</th>
+                                        <th>Stock</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="productsTableBody">
+                                    <!-- Products will be listed here -->
+                                </tbody>
+                            </table>
+                        </div>
                     </section>
                 </div>
             </div>
@@ -252,6 +311,35 @@
                 </div>
             </div>
         </main>
+
+        <!-- Contact Section -->
+        <section class="contact-section">
+            <div class="container">
+                <h2>Hubungi Kami</h2>
+                <div class="contact-grid">
+                    <div class="contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <h3>Alamat</h3>
+                        <p>Jl. Sayur Segar No. 123<br>Jakarta Selatan, 12345</p>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <h3>Telepon</h3>
+                        <p><a href="tel:+62812345678">+62 812-345-678</a></p>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <h3>Email</h3>
+                        <p><a href="mailto:info@tokosayurbuah.com">info@tokosayurbuah.com</a></p>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-clock"></i>
+                        <h3>Jam Operasional</h3>
+                        <p>Senin - Jumat: 08:00 - 17:00<br>Sabtu - Minggu: 09:00 - 16:00</p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
         <!-- Footer -->
         <footer class="footer">

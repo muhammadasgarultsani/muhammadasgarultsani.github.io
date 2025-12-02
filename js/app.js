@@ -196,8 +196,14 @@ function loginSuccess(username, isAdmin) {
     // Update UI
     updateUserDisplay();
     if (isAdmin) {
+        // Hide Orders and Products links for admin, show only Admin Panel
+        document.querySelector('a[onclick="switchPage(\'orders\')"').style.display = 'none';
         document.querySelector('.admin-link').classList.add('visible');
         loadAdminPanel();
+    } else {
+        // Show Orders for regular users, hide Admin Panel
+        document.querySelector('a[onclick="switchPage(\'orders\')"').style.display = 'block';
+        document.querySelector('.admin-link').classList.remove('visible');
     }
 
     // Load home page
@@ -232,8 +238,7 @@ function logout() {
 
 function updateUserDisplay() {
     const userDisplay = document.getElementById('userDisplay');
-    const role = isAdminMode ? 'Admin' : 'Pembeli';
-    userDisplay.textContent = `${currentUser.username} (${role})`;
+    userDisplay.textContent = currentUser.username;
 }
 
 // ==========================================
@@ -282,12 +287,64 @@ function filterProducts(category) {
     });
     event.target.classList.add('active');
     
+    // Clear search when filtering
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) searchInput.value = '';
+    
     // Reload products with filter
     loadHomePage();
 }
 
+function searchProducts(query) {
+    const productsGrid = document.getElementById('productsGrid');
+    const adsContainer = document.getElementById('adsContainer');
+    let products = JSON.parse(localStorage.getItem('products'));
+    
+    if (!products || products.length === 0) {
+        products = dummyProducts;
+    }
+
+    productsGrid.innerHTML = '';
+
+    // Hide ads when searching, show when empty
+    if (query.trim() === '') {
+        adsContainer.style.display = 'block';
+        // Reload full data with ads
+        const adGrid = document.createElement('div');
+        adGrid.className = 'ads-container';
+        advertisements.forEach(ad => {
+            const adElement = document.createElement('div');
+            adElement.className = 'ad-item';
+            adElement.innerHTML = `<img src="${ad.image}" alt="${ad.alt}" class="ad-image">`;
+            adGrid.appendChild(adElement);
+        });
+        adsContainer.innerHTML = '';
+        adsContainer.appendChild(adGrid);
+    } else {
+        adsContainer.style.display = 'none';
+    }
+
+    // Search and filter products
+    let filteredProducts = products.filter(p => {
+        const matchSearch = p.name.toLowerCase().includes(query.toLowerCase());
+        const matchCategory = currentFilter === 'Semua' || p.category === currentFilter;
+        return matchSearch && matchCategory;
+    });
+
+    if (filteredProducts.length === 0) {
+        productsGrid.innerHTML += '<div class="empty-state"><i class="fas fa-search"></i><p>Produk tidak ditemukan</p></div>';
+        return;
+    }
+
+    filteredProducts.forEach(product => {
+        const card = createProductCard(product);
+        productsGrid.appendChild(card);
+    });
+}
+
 function loadHomePage() {
     const productsGrid = document.getElementById('productsGrid');
+    const adsContainer = document.getElementById('adsContainer');
     let products = JSON.parse(localStorage.getItem('products'));
     
     // Fallback to dummyProducts if localStorage doesn't have products
@@ -298,16 +355,17 @@ function loadHomePage() {
 
     productsGrid.innerHTML = '';
 
-    // Display advertisements
-    const adsContainer = document.createElement('div');
-    adsContainer.className = 'ads-container';
+    // Display advertisements (separate container)
+    adsContainer.innerHTML = '';
+    const adGrid = document.createElement('div');
+    adGrid.className = 'ads-container';
     advertisements.forEach(ad => {
         const adElement = document.createElement('div');
         adElement.className = 'ad-item';
         adElement.innerHTML = `<img src="${ad.image}" alt="${ad.alt}" class="ad-image">`;
-        adsContainer.appendChild(adElement);
+        adGrid.appendChild(adElement);
     });
-    productsGrid.appendChild(adsContainer);
+    adsContainer.appendChild(adGrid);
 
     // Filter products by category
     let filteredProducts = products;
@@ -561,7 +619,130 @@ function loadAdminPanel() {
         return;
     }
 
+    loadAdminDashboard();
     loadProductsTable();
+}
+
+function loadAdminDashboard() {
+    const orders = JSON.parse(localStorage.getItem('orders')) || [];
+    
+    // Calculate statistics
+    const totalOrders = orders.length;
+    const pendingOrders = orders.filter(o => o.status === 'Pending').length;
+    const completedOrders = orders.filter(o => o.status === 'Selesai').length;
+    const uniqueCustomers = new Set(orders.map(o => o.productName)).size;
+    
+    // Update stats display
+    document.getElementById('totalOrdersStat').textContent = totalOrders;
+    document.getElementById('pendingOrdersStat').textContent = pendingOrders;
+    document.getElementById('completedOrdersStat').textContent = completedOrders;
+    document.getElementById('totalCustomersStat').textContent = totalOrders;
+    
+    // Display pending orders
+    loadPendingOrders();
+}
+
+function loadPendingOrders() {
+    const container = document.getElementById('pendingOrdersContainer');
+    const orders = JSON.parse(localStorage.getItem('orders')) || [];
+    const pendingOrders = orders.filter(o => o.status === 'Pending');
+    
+    container.innerHTML = '';
+    
+    if (pendingOrders.length === 0) {
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-check"></i><p>Tidak ada pesanan yang belum diproses</p></div>';
+        return;
+    }
+    
+    const table = document.createElement('table');
+    table.className = 'orders-table';
+    table.innerHTML = `
+        <thead>
+            <tr>
+                <th>No. Pesanan</th>
+                <th>Produk</th>
+                <th>Jumlah</th>
+                <th>Total Harga</th>
+                <th>Alamat</th>
+                <th>Tanggal</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${pendingOrders.map(order => `
+                <tr>
+                    <td><strong>${order.id}</strong></td>
+                    <td>${order.productName}</td>
+                    <td>${order.quantity}</td>
+                    <td>Rp ${formatPrice(order.totalPrice)}</td>
+                    <td>${order.address}</td>
+                    <td>${order.date}</td>
+                    <td>
+                        <button class="btn btn-small btn-success" onclick="completeOrder('${order.id}')">Selesai</button>
+                        <button class="btn btn-small btn-info" onclick="viewOrderDetail('${order.id}')">Detail</button>
+                    </td>
+                </tr>
+            `).join('')}
+        </tbody>
+    `;
+    container.appendChild(table);
+}
+
+function completeOrder(orderId) {
+    const orders = JSON.parse(localStorage.getItem('orders')) || [];
+    const order = orders.find(o => o.id === orderId);
+    
+    if (order) {
+        order.status = 'Selesai';
+        localStorage.setItem('orders', JSON.stringify(orders));
+        alert('Pesanan berhasil ditandai selesai!');
+        loadAdminDashboard();
+    }
+}
+
+function viewOrderDetail(orderId) {
+    const orders = JSON.parse(localStorage.getItem('orders')) || [];
+    const order = orders.find(o => o.id === orderId);
+    
+    if (order) {
+        const detail = `
+DETAIL PESANAN
+===============
+No. Pesanan: ${order.id}
+Produk: ${order.productName}
+Jumlah: ${order.quantity}
+Harga Satuan: Rp ${formatPrice(order.price)}
+Total Harga: Rp ${formatPrice(order.totalPrice)}
+
+ALAMAT PENGIRIMAN
+=================
+${order.address}
+
+LOKASI GPS
+==========
+Latitude: ${order.lat}
+Longitude: ${order.lng}
+
+Tanggal Pesanan: ${order.date}
+Status: ${order.status}
+        `;
+        alert(detail);
+    }
+}
+
+function toggleProductManagement() {
+    const section = document.getElementById('productManagementSection');
+    const icon = document.getElementById('productMgmtIcon');
+    
+    if (section.style.display === 'none') {
+        section.style.display = 'block';
+        icon.classList.remove('fa-chevron-down');
+        icon.classList.add('fa-chevron-up');
+    } else {
+        section.style.display = 'none';
+        icon.classList.remove('fa-chevron-up');
+        icon.classList.add('fa-chevron-down');
+    }
 }
 
 function loadProductsTable() {
