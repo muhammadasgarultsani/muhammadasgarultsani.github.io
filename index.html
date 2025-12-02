@@ -48,9 +48,7 @@
                     <a href="#admin" class="nav-link admin-link" onclick="switchPage('admin')" style="display: none;">Admin Panel</a>
                     <a href="#" class="nav-link" onclick="logout()">Logout</a>
                 </nav>
-                <div class="user-info">
-                    <span id="userDisplay"></span>
-                </div>
+                
             </div>
         </header>
 
@@ -345,6 +343,18 @@
         <footer class="footer">
             <p>&copy; 2025 Toko Sayur dan Buah Online. All rights reserved.</p>
         </footer>
+    </div>
+
+    <!-- UI Toast + Modal Containers -->
+    <div id="uiToast" class="ui-toast" aria-live="polite"></div>
+
+    <div id="uiModal" class="ui-modal" role="dialog" aria-modal="true" style="display:none;">
+        <div class="ui-modal-overlay" onclick="closeModal()"></div>
+        <div class="ui-modal-content">
+            <button class="ui-modal-close" onclick="closeModal()">&times;</button>
+            <div id="uiModalBody"></div>
+            <div class="ui-modal-actions" id="uiModalActions"></div>
+        </div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>

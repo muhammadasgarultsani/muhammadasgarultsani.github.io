@@ -194,7 +194,6 @@ function loginSuccess(username, isAdmin) {
     document.getElementById('appContainer').style.display = 'block';
 
     // Update UI
-    updateUserDisplay();
     if (isAdmin) {
         // Hide Orders and Products links for admin, show only Admin Panel
         document.querySelector('a[onclick="switchPage(\'orders\')"').style.display = 'none';
@@ -220,6 +219,58 @@ function skipLogin() {
     loginSuccess('Guest', false);
 }
 
+// ==========================================
+// UI Helpers: Toasts and Modal
+// ==========================================
+function showToast(message, type = 'info', timeout = 3500) {
+    const container = document.getElementById('uiToast');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `
+        <div class="toast-icon">${type === 'success' ? '<i class="fas fa-check-circle"></i>' : type === 'error' ? '<i class="fas fa-exclamation-triangle"></i>' : type === 'warn' ? '<i class="fas fa-exclamation-circle"></i>' : '<i class="fas fa-info-circle"></i>'}</div>
+        <div class="toast-text">${message}</div>
+    `;
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.transform = 'translateX(20px)';
+        toast.style.opacity = '0';
+        setTimeout(() => container.removeChild(toast), 300);
+    }, timeout);
+}
+
+function showModal(title, htmlContent, actions = []) {
+    const modal = document.getElementById('uiModal');
+    const body = document.getElementById('uiModalBody');
+    const actionsEl = document.getElementById('uiModalActions');
+    if (!modal || !body || !actionsEl) return;
+
+    body.innerHTML = `<h3 style="margin-top:0; color:#27ae60">${title}</h3>` + htmlContent;
+    actionsEl.innerHTML = '';
+
+    actions.forEach(act => {
+        const btn = document.createElement('button');
+        btn.className = act.class || 'btn btn-primary';
+        btn.textContent = act.label || 'OK';
+        btn.onclick = () => {
+            if (act.onClick) act.onClick();
+            if (act.close !== false) closeModal();
+        };
+        actionsEl.appendChild(btn);
+    });
+
+    modal.style.display = 'flex';
+}
+
+function closeModal() {
+    const modal = document.getElementById('uiModal');
+    if (!modal) return;
+    modal.style.display = 'none';
+}
+
 function logout() {
     currentUser = null;
     isAdminMode = false;
@@ -236,10 +287,7 @@ function logout() {
     switchPage('home');
 }
 
-function updateUserDisplay() {
-    const userDisplay = document.getElementById('userDisplay');
-    userDisplay.textContent = currentUser.username;
-}
+
 
 // ==========================================
 // Page Navigation
@@ -414,7 +462,7 @@ function createProductCard(product) {
 
 function openCartModal(productId) {
     if (!currentUser || isAdminMode) {
-        alert('Hanya pembeli yang bisa memesan. Silakan logout dan login sebagai pembeli.');
+        showToast('Hanya pembeli yang bisa memesan. Silakan logout dan login sebagai pembeli.', 'warn');
         return;
     }
 
@@ -496,12 +544,12 @@ function handleOrder(e) {
     const lng = document.getElementById('cartLng').value;
 
     if (!address) {
-        alert('Alamat tidak boleh kosong!');
+        showToast('Alamat tidak boleh kosong!', 'warn');
         return;
     }
 
     if (!lat || !lng) {
-        alert('Pilih lokasi pada peta terlebih dahulu!');
+        showToast('Pilih lokasi pada peta terlebih dahulu!', 'warn');
         return;
     }
 
@@ -510,7 +558,7 @@ function handleOrder(e) {
     const product = products.find(p => p.id === productId);
 
     if (!product) {
-        alert('Produk tidak ditemukan!');
+        showToast('Produk tidak ditemukan!', 'error');
         return;
     }
 
@@ -523,6 +571,8 @@ function handleOrder(e) {
         price: product.price,
         totalPrice: product.price * quantity,
         address: address,
+        // attach customer username if available
+        customer: (currentUser && currentUser.username) ? currentUser.username : 'Guest',
         lat: lat,
         lng: lng,
         date: new Date().toLocaleString('id-ID'),
@@ -534,7 +584,7 @@ function handleOrder(e) {
     orders.push(order);
     localStorage.setItem('orders', JSON.stringify(orders));
 
-    alert('Pesanan berhasil dibuat! Nomor Pesanan: ' + order.id);
+    showToast('Pesanan berhasil dibuat! Nomor Pesanan: ' + order.id, 'success');
     closeCartModal();
     loadOrdersPage();
     switchPage('orders');
@@ -606,7 +656,14 @@ function createOrderCard(order) {
 }
 
 function showOrderMap(lat, lng) {
-    alert(`Lokasi pengiriman:\nLatitude: ${lat}\nLongitude: ${lng}\n\nBuka di Google Maps: https://maps.google.com/?q=${lat},${lng}`);
+    const content = `
+<p><strong>Latitude:</strong> ${lat}</p>
+<p><strong>Longitude:</strong> ${lng}</p>
+`;
+    showModal('Lokasi Pengiriman', content, [
+        { label: 'Buka Google Maps', class: 'btn btn-primary', onClick: () => { window.open(`https://maps.google.com/?q=${lat},${lng}`, '_blank'); } },
+        { label: 'Tutup', class: 'btn btn-secondary' }
+    ]);
 }
 
 // ==========================================
@@ -615,7 +672,7 @@ function showOrderMap(lat, lng) {
 
 function loadAdminPanel() {
     if (!isAdminMode) {
-        alert('Akses ditolak. Hanya admin yang bisa mengakses panel ini.');
+        showToast('Akses ditolak. Hanya admin yang bisa mengakses panel ini.', 'error');
         return;
     }
 
@@ -630,13 +687,13 @@ function loadAdminDashboard() {
     const totalOrders = orders.length;
     const pendingOrders = orders.filter(o => o.status === 'Pending').length;
     const completedOrders = orders.filter(o => o.status === 'Selesai').length;
-    const uniqueCustomers = new Set(orders.map(o => o.productName)).size;
+    const uniqueCustomers = new Set(orders.map(o => o.customer || o.address)).size;
     
     // Update stats display
     document.getElementById('totalOrdersStat').textContent = totalOrders;
     document.getElementById('pendingOrdersStat').textContent = pendingOrders;
     document.getElementById('completedOrdersStat').textContent = completedOrders;
-    document.getElementById('totalCustomersStat').textContent = totalOrders;
+    document.getElementById('totalCustomersStat').textContent = uniqueCustomers;
     
     // Display pending orders
     loadPendingOrders();
@@ -695,7 +752,7 @@ function completeOrder(orderId) {
     if (order) {
         order.status = 'Selesai';
         localStorage.setItem('orders', JSON.stringify(orders));
-        alert('Pesanan berhasil ditandai selesai!');
+        showToast('Pesanan berhasil ditandai selesai!', 'success');
         loadAdminDashboard();
     }
 }
@@ -726,7 +783,7 @@ Longitude: ${order.lng}
 Tanggal Pesanan: ${order.date}
 Status: ${order.status}
         `;
-        alert(detail);
+        showModal('Detail Pesanan', `<pre style="white-space:pre-wrap">${detail}</pre>`, [{ label: 'Tutup', class: 'btn btn-secondary' }]);
     }
 }
 
@@ -784,13 +841,13 @@ function handleAddProduct(e) {
     let image = null;
 
     if (!name || !category || !price || stock === '') {
-        alert('Semua field harus diisi!');
+        showToast('Semua field harus diisi!', 'warn');
         return;
     }
 
     // Check if image is selected
     if (!imageFile && !imageUrl) {
-        alert('Pilih atau upload gambar produk!');
+        showToast('Pilih atau upload gambar produk!', 'warn');
         return;
     }
 
@@ -802,7 +859,7 @@ function handleAddProduct(e) {
     }
 
     if (!image) {
-        alert('Gagal memproses gambar!');
+        showToast('Gagal memproses gambar!', 'error');
         return;
     }
 
@@ -821,7 +878,7 @@ function handleAddProduct(e) {
     products.push(newProduct);
     localStorage.setItem('products', JSON.stringify(products));
 
-    alert('Produk berhasil ditambahkan!');
+    showToast('Produk berhasil ditambahkan!', 'success');
     document.getElementById('addProductForm').reset();
     document.getElementById('addImagePreviewImg').style.display = 'none';
     document.getElementById('productImageUrl').value = '';
@@ -875,7 +932,7 @@ function handleEditProduct(e) {
     const product = products.find(p => p.id === productId);
 
     if (!product) {
-        alert('Produk tidak ditemukan!');
+        showToast('Produk tidak ditemukan!', 'error');
         return;
     }
 
@@ -893,7 +950,7 @@ function handleEditProduct(e) {
 
     localStorage.setItem('products', JSON.stringify(products));
 
-    alert('Produk berhasil diupdate!');
+    showToast('Produk berhasil diupdate!', 'success');
     closeEditModal();
     loadProductsTable();
     loadHomePage();
@@ -908,7 +965,7 @@ function deleteProduct(productId) {
     products = products.filter(p => p.id !== productId);
     localStorage.setItem('products', JSON.stringify(products));
 
-    alert('Produk berhasil dihapus!');
+    showToast('Produk berhasil dihapus!', 'success');
     loadProductsTable();
     loadHomePage();
 }
@@ -927,7 +984,7 @@ function previewImage(file, imgElementId, previewContainerId) {
 
     // Validate file size (max 2MB)
     if (file.size > 2 * 1024 * 1024) {
-        alert('Ukuran file terlalu besar! Maksimal 2MB');
+        showToast('Ukuran file terlalu besar! Maksimal 2MB', 'warn');
         return;
     }
 
@@ -949,7 +1006,7 @@ function previewImageUrl(url, imgElementId, previewContainerId) {
         imgElement.style.display = 'block';
     };
     imgElement.onerror = function() {
-        alert('Gambar tidak dapat dimuat. Cek URL dan coba lagi.');
+        showToast('Gambar tidak dapat dimuat. Cek URL dan coba lagi.', 'error');
         imgElement.style.display = 'none';
     };
 }
