@@ -11,7 +11,7 @@
         <h1>Pendataan Kematian di Kantor Camat Suralaga</h1>
     </header>
     <main>
-        <section>
+        <section class="inp-form">
             <h2>Form Pendataan Kematian</h2>
             <form>
                 <label for="nama">Nama:</label>
@@ -23,29 +23,36 @@
                 <button type="submit">Kirim</button>
             </form>
         </section>
-        <section id="death-count">
-            <h2>Jumlah Kematian Tercatat</h2>
-            <p>Bulan: <input type="text" id="month" placeholder="Bulan (1-12)"></p>
-            <p>Tahun: <input type="text" id="year" placeholder="Tahun"></p>
-            <button onclick="countDeaths()">Hitung</button>
-            <p id="result"></p>
         </section>
     </main>
     <footer>
         <p>&copy; 2026 Kantor Camat Suralaga</p>
     </footer>
     <script>
+        let deathRecords = [];
+
+        // Fungsi untuk mengambil data dari database (simulasi)
+        function fetchDeathRecords() {
+            // Simulasi data kematian dari database
+            deathRecords = [
+                { date: '2026-01-15', cause: 'Penyakit' },
+                { date: '2026-01-20', cause: 'Kecelakaan' },
+                { date: '2026-02-10', cause: 'Penyakit' }
+            ];
+        }
+
         function countDeaths() {
             const month = document.getElementById('month').value;
             const year = document.getElementById('year').value;
-            // Simulasi data kematian
-            const deaths = {
-                '2026': { '1': 5, '2': 3, '3': 4 }, // Data contoh
-                '2025': { '1': 2, '2': 6, '3': 1 }
-            };
-            const count = deaths[year] ? deaths[year][month] || 0 : 0;
+            const count = deathRecords.filter(record => {
+                const recordDate = new Date(record.date);
+                return recordDate.getMonth() + 1 == month && recordDate.getFullYear() == year;
+            }).length;
             document.getElementById('result').innerText = `Jumlah kematian pada ${month}/${year}: ${count}`;
         }
+
+        // Ambil data saat halaman dimuat
+        fetchDeathRecords();
     </script>
 </body>
 </html>
