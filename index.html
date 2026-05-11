@@ -1,58 +1,20 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pendataan Kematian - Kantor Camat Suralaga</title>
-    <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pendataan Kematian - Kantor Camat Suralaga</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
-    <header>
-        <h1>Pendataan Kematian di Kantor Camat Suralaga</h1>
-    </header>
-    <main>
-        <section class="inp-form">
-            <h2>Form Pendataan Kematian</h2>
-            <form>
-                <label for="nama">Nama:</label>
-                <input type="text" id="nama" name="nama" required>
-                <label for="tanggalKematian">Tanggal Kematian:</label>
-                <input type="date" id="tanggalKematian" name="tanggalKematian" required>
-                <label for="sebabKematian">Sebab Kematian:</label>
-                <input type="text" id="sebabKematian" name="sebabKematian" required>
-                <button type="submit">Kirim</button>
-            </form>
-        </section>
-        </section>
-    </main>
-    <footer>
-        <p>&copy; 2026 Kantor Camat Suralaga</p>
-    </footer>
-    <script>
-        let deathRecords = [];
-
-        // Fungsi untuk mengambil data dari database (simulasi)
-        function fetchDeathRecords() {
-            // Simulasi data kematian dari database
-            deathRecords = [
-                { date: '2026-01-15', cause: 'Penyakit' },
-                { date: '2026-01-20', cause: 'Kecelakaan' },
-                { date: '2026-02-10', cause: 'Penyakit' }
-            ];
-        }
-
-        function countDeaths() {
-            const month = document.getElementById('month').value;
-            const year = document.getElementById('year').value;
-            const count = deathRecords.filter(record => {
-                const recordDate = new Date(record.date);
-                return recordDate.getMonth() + 1 == month && recordDate.getFullYear() == year;
-            }).length;
-            document.getElementById('result').innerText = `Jumlah kematian pada ${month}/${year}: ${count}`;
-        }
-
-        // Ambil data saat halaman dimuat
-        fetchDeathRecords();
-    </script>
+  <div class="container">
+    <div class="header">
+      <div class="profile"> <img src="" alt=""></div>
+      <h3>MUHAMMMAD ASGARUL TSANI</h3>
+    </div>
+  </div>
 </body>
+
 </html>
